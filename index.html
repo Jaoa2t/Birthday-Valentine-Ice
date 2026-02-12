@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Puzzle Game 🌸</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --pink-pastel: #fff5f7;
+            --pink-main: #ffb6c1;
+            --pink-dark: #f08080;
+            --text-color: #5d5d5d;
+        }
+
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Kanit', sans-serif;
+            background-color: var(--pink-pastel);
+            color: var(--text-color);
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(240, 128, 128, 0.1);
+            text-align: center;
+            max-width: 450px; width: 90%;
+            transition: all 0.4s ease;
+        }
+
+        h2 { color: var(--pink-dark); margin-bottom: 1rem; }
+        
+        input {
+            width: 100%; padding: 12px; margin-bottom: 10px;
+            border: 2px solid #ffe4e1; border-radius: 12px;
+            font-family: 'Kanit', sans-serif; text-align: center;
+            box-sizing: border-box; outline: none;
+        }
+
+        .btn {
+            background-color: var(--pink-dark); color: white;
+            border: none; padding: 12px 30px; border-radius: 30px;
+            cursor: pointer; font-family: 'Kanit', sans-serif; width: 100%;
+            transition: 0.3s; font-size: 1rem;
+        }
+
+        .btn:hover { background-color: #e57373; transform: scale(1.02); }
+
+        .hidden { display: none; }
+
+        /* Quiz Styles */
+        .img-box {
+            width: 100%; height: 280px;
+            margin-bottom: 15px; border-radius: 15px;
+            overflow: hidden; border: 4px solid var(--pink-pastel);
+            background-color: #f9f9f9;
+        }
+
+        .quiz-img { width: 100%; height: 100%; object-fit: cover; }
+
+        .options-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+        }
+
+        .option-btn {
+            padding: 12px; border: 2px solid #ffe4e1;
+            border-radius: 10px; cursor: pointer; transition: 0.2s;
+            font-size: 0.95rem; background: white; font-family: 'Kanit';
+        }
+
+        .option-btn:hover { background: var(--pink-pastel); border-color: var(--pink-main); }
+
+        .reveal-text { font-size: 1.1rem; color: #d63384; margin-bottom: 15px; font-weight: 500; }
+    </style>
+</head>
+<body>
+
+    <div id="step-info" class="container">
+        <h2 id="info-title">ยืนยันตัวตน 💖</h2>
+        <p id="info-desc">กรุณาระบุชื่อเล่นของคุณ</p>
+        <input type="text" id="info-input" placeholder="พิมพ์ตรงนี้...">
+        <button class="btn" onclick="processInfo()">ตกลง</button>
+    </div>
+
+    <div id="step-quiz" class="container hidden">
+        <h2 id="quiz-header">ปริศนาที่ 1</h2>
+        <div class="img-box">
+            <img id="quiz-img" src="" class="quiz-img">
+        </div>
+        <p id="quiz-question">ภาพนี้คืออะไรเอ่ย?</p>
+        <div class="options-grid" id="quiz-options"></div>
+    </div>
+
+    <div id="step-reveal" class="container hidden">
+        <h2>ถูกต้องแล้วจ้า! 🎉</h2>
+        <div class="img-box">
+            <img id="reveal-img" src="" class="quiz-img">
+        </div>
+        <p id="reveal-desc" class="reveal-text">ข้อความเฉลย...</p>
+        <button class="btn" onclick="nextQuestion()">ไปข้อถัดไป ➔</button>
+    </div>
+
+    <div id="step-final" class="container hidden">
+        <img id="final-img" src="" style="width:130px; height:130px; border-radius:50%; border:5px solid var(--pink-main); margin-bottom:20px; object-fit:cover;">
+        <h2>Happy Valentine & HBD!</h2>
+        <p>คุณเก่งที่สุดเลย! ตอบถูกครบทุกข้อ <br>
+           ขอบคุณที่จำเรื่องราวของเราได้นะ <br>
+           รักที่สุดในโลกเลย! <span style="color:red">❤</span></p>
+    </div>
+
+    <script>
+        // 1. ตั้งค่าข้อมูลส่วนตัว
+        const MASTER_DATA = [
+            { id: "nickname", title: "ยืนยันตัวตน 💖", desc: "ชื่อเล่นของคุณ?", ans: "ไอซ์" },
+            { id: "fullname", title: "ขอชื่อจริงด้วยจ้า 🌸", desc: "ชื่อจริง-นามสกุลของคุณ?", ans: "จิรพรรณ พิสุทรอานนท์" },
+            { id: "bday", title: "วันเกิดล่ะ 🎂", desc: "เกิดวันที่เท่าไหร่?", ans: "2001-02-20", type: "date" }
+        ];
+
+        // 2. ตั้งค่าเกมปริศนา (ภาพปริศนา + ภาพเฉลย)
+        const GAMES = [
+            {
+                puzzle_img: "https://img5.pic.in.th/file/secure-sv1/quiz14684d0a1e3986b1e.png", // ลิงก์ภาพที่เบลอหรือซูม
+                reveal_img: "https://img2.pic.in.th/quiz1aws024ff325a2fab2d5.png",   // ลิงก์ภาพที่เฉลยแบบชัดๆ
+                q: "ภาพเบลอๆ นี้คือตตตัวอะไรกันน้าาาา?",
+                options: ["หมู", "สิงโต", "แมว", "เธอ"],
+                correct: 2,
+                desc: "เก่งมาก....ก็มันคือแมวไงล้าาาา"
+            },
+            {
+                puzzle_img: "https://img2.pic.in.th/quiz2.png",
+                reveal_img: "https://img5.pic.in.th/file/secure-sv1/quiz2aws.png",
+                q: "แล้วตัวนี้ มันเป็นตัวอะไรนะ?",
+                options: ["ยีราฟ", "สิงโต", "ช้าง", "เธอ"],
+                correct: 3,
+                desc: "อ่าว ทำไมมันเป็นเธอไปได้ละเนี้ยยยยยย"
+            },
+            {
+                puzzle_img: "https://img2.pic.in.th/quiz3.png",
+                reveal_img: "https://img5.pic.in.th/file/secure-sv1/quiz3aws.png",
+                q: "การ์ตูนอะไรนะที่มีของวิเศษ ?",
+                options: ["โดเรไอซ์", "โดเรมอน", "โดเรซอลลา", "โดเรมี่"],
+                correct: 0,
+                desc: "โดเรไอซ์ ไงล้าาา ช่วยฉันทุกเรื่อย ซัพพอร์ตฉันตลอดเลยน้าาาาา💖💖"
+            },
+            {
+                puzzle_img: "https://img5.pic.in.th/file/secure-sv1/quiz4fb84abcf7647ae34.png",
+                reveal_img: "https://img2.pic.in.th/quiz4aws.png",
+                q: "การ์ตูนเรื่องอะไรที่เธอชอบดู?",
+                options: ["นักสืบไอซ์ตัวจิ้ว", "นักสืบเยาวชน", "โคนัน", "โคโค่"],
+                correct: 0,
+                desc: "นักสืบไอซ์ตัวจิ้ว ไงล่ะ สืบฉันรู้ทุกเรื่องไปหมมดเลยน่ะ คนดีของพี่"
+            }
+        ];
+
+        const FINAL_PHOTO = "https://img2.pic.in.th/0dc81298-2bd1-4b6f-80e3-fdd001212c40.jpg";
+
+        let infoIdx = 0;
+        let gameIdx = 0;
+
+        function processInfo() {
+            const input = document.getElementById('info-input');
+            const target = MASTER_DATA[infoIdx];
+            if (input.value === target.ans) {
+                infoIdx++;
+                if (infoIdx < MASTER_DATA.length) {
+                    const next = MASTER_DATA[infoIdx];
+                    document.getElementById('info-title').innerText = next.title;
+                    document.getElementById('info-desc').innerText = next.desc;
+                    input.type = next.type || "text";
+                    input.value = "";
+                } else {
+                    showStep('quiz'); loadQuiz();
+                }
+            } else { alert("ข้อมูลไม่ถูกต้องนะจ๊ะ!"); }
+        }
+
+        function loadQuiz() {
+            const data = GAMES[gameIdx];
+            document.getElementById('quiz-header').innerText = `ปริศนาที่ ${gameIdx + 1}`;
+            document.getElementById('quiz-img').src = data.puzzle_img;
+            document.getElementById('quiz-question').innerText = data.q;
+            const optDiv = document.getElementById('quiz-options');
+            optDiv.innerHTML = '';
+            data.options.forEach((opt, idx) => {
+                const b = document.createElement('button');
+                b.className = 'option-btn';
+                b.innerText = opt;
+                b.onclick = () => {
+                    if(idx === data.correct) showReveal();
+                    else alert("ผิดแล้ววว ลองดูใหม่!");
+                };
+                optDiv.appendChild(b);
+            });
+        }
+
+        function showReveal() {
+            const data = GAMES[gameIdx];
+            document.getElementById('reveal-img').src = data.reveal_img;
+            document.getElementById('reveal-desc').innerText = data.desc;
+            showStep('reveal');
+        }
+
+        function nextQuestion() {
+            gameIdx++;
+            if (gameIdx < GAMES.length) {
+                showStep('quiz'); loadQuiz();
+            } else {
+                document.getElementById('final-img').src = FINAL_PHOTO;
+                showStep('final');
+            }
+        }
+
+        function showStep(id) {
+            document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
+            document.getElementById('step-' + id).classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
