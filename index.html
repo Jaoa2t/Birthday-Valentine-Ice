@@ -1,223 +1,865 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Memory Puzzle Game 🌸</title>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;500&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --pink-pastel: #fff5f7;
-            --pink-main: #ffb6c1;
-            --pink-dark: #f08080;
-            --text-color: #5d5d5d;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>For You 💗</title>
 
-        body {
-            margin: 0; padding: 0;
-            font-family: 'Kanit', sans-serif;
-            background-color: var(--pink-pastel);
-            color: var(--text-color);
-            display: flex; justify-content: center; align-items: center;
-            min-height: 100vh;
-        }
+  <style>
+    *{ margin:0; padding:0; box-sizing:border-box; }
+    body{
+      height:100vh;
+      display:grid;
+      place-items:center;
+      background:#fff6f9;
+      color:#2a1f24;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+      overflow:hidden;
+    }
 
-        .container {
-            background: white;
-            padding: 2rem;
-            border-radius: 25px;
-            box-shadow: 0 10px 30px rgba(240, 128, 128, 0.1);
-            text-align: center;
-            max-width: 450px; width: 90%;
-            transition: all 0.4s ease;
-        }
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(255,145,180,.22), transparent 55%),
+        radial-gradient(circle at 80% 90%, rgba(255,90,140,.12), transparent 55%),
+        radial-gradient(circle at 50% 55%, rgba(255,220,235,.30), transparent 65%);
+      pointer-events:none;
+    }
 
-        h2 { color: var(--pink-dark); margin-bottom: 1rem; }
-        
-        input {
-            width: 100%; padding: 12px; margin-bottom: 10px;
-            border: 2px solid #ffe4e1; border-radius: 12px;
-            font-family: 'Kanit', sans-serif; text-align: center;
-            box-sizing: border-box; outline: none;
-        }
+    .wrap{
+      width:min(92vw, 620px);
+      padding:22px;
+      position:relative;
+      z-index:2;
+    }
 
-        .btn {
-            background-color: var(--pink-dark); color: white;
-            border: none; padding: 12px 30px; border-radius: 30px;
-            cursor: pointer; font-family: 'Kanit', sans-serif; width: 100%;
-            transition: 0.3s; font-size: 1rem;
-        }
+    .card{
+      background: rgba(255,255,255,0.78);
+      border: 1px solid rgba(255, 90, 140, 0.16);
+      border-radius: 28px;
+      padding: 26px;
+      box-shadow: 0 22px 80px rgba(255, 90, 140, 0.12);
+      backdrop-filter: blur(10px);
+      position: relative;
+      overflow: hidden;
+      transform: translateY(10px);
+      animation: rise .65s ease forwards;
+    }
 
-        .btn:hover { background-color: #e57373; transform: scale(1.02); }
+    @keyframes rise{ to{ transform: translateY(0); } }
 
-        .hidden { display: none; }
+    .top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:16px;
+    }
 
-        /* Quiz Styles */
-        .img-box {
-            width: 100%; height: 280px;
-            margin-bottom: 15px; border-radius: 15px;
-            overflow: hidden; border: 4px solid var(--pink-pastel);
-            background-color: #f9f9f9;
-        }
+    .chip{
+      font-size:13px;
+      padding:8px 12px;
+      border-radius:999px;
+      background: rgba(255, 90, 140, 0.08);
+      border: 1px solid rgba(255, 90, 140, 0.12);
+      color: rgba(42,31,36,0.85);
+      letter-spacing:.2px;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+    }
 
-        .quiz-img { width: 100%; height: 100%; object-fit: cover; }
+    .tiny-heart{
+      width:10px;
+      height:10px;
+      transform: rotate(45deg);
+      background:#ff3b7a;
+      position:relative;
+      opacity:.95;
+    }
+    .tiny-heart::before,
+    .tiny-heart::after{
+      content:"";
+      position:absolute;
+      width:10px;
+      height:10px;
+      background:#ff3b7a;
+      border-radius:50%;
+    }
+    .tiny-heart::before{ left:-5px; top:0; }
+    .tiny-heart::after{ left:0; top:-5px; }
 
-        .options-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
-        }
+    h1{
+      font-size: 34px;
+      line-height: 1.15;
+      letter-spacing: -0.9px;
+      margin-bottom: 8px;
+      color:#2a1f24;
+    }
 
-        .option-btn {
-            padding: 12px; border: 2px solid #ffe4e1;
-            border-radius: 10px; cursor: pointer; transition: 0.2s;
-            font-size: 0.95rem; background: white; font-family: 'Kanit';
-        }
+    .sub{
+      font-size:15px;
+      line-height:1.7;
+      color: rgba(42,31,36,0.72);
+      margin-bottom: 16px;
+      white-space: pre-line;
+    }
 
-        .option-btn:hover { background: var(--pink-pastel); border-color: var(--pink-main); }
+    .panel{
+      margin-top: 14px;
+      padding: 16px;
+      border-radius: 20px;
+      background: rgba(255, 90, 140, 0.05);
+      border: 1px solid rgba(255, 90, 140, 0.12);
+    }
 
-        .reveal-text { font-size: 1.1rem; color: #d63384; margin-bottom: 15px; font-weight: 500; }
-    </style>
+    .typing{
+      min-height: 76px;
+      font-size: 18px;
+      line-height: 1.7;
+      font-weight: 850;
+      letter-spacing: -0.2px;
+      color:#2a1f24;
+      white-space: pre-line;
+    }
+
+    .actions{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    button{
+      border:none;
+      border-radius: 16px;
+      padding: 14px 14px;
+      font-weight: 900;
+      font-size: 14px;
+      cursor:pointer;
+      transition: transform .12s ease, opacity .12s ease;
+      user-select:none;
+    }
+    button:active{ transform: scale(.98); }
+
+    .primary{
+      background:#ff3b7a;
+      color:#fff;
+      box-shadow: 0 14px 40px rgba(255, 59, 122, 0.18);
+    }
+    .ghost{
+      background: rgba(255, 90, 140, 0.08);
+      border: 1px solid rgba(255, 90, 140, 0.14);
+      color:#2a1f24;
+    }
+
+    .foot{
+      margin-top: 14px;
+      font-size: 12px;
+      color: rgba(42,31,36,0.55);
+      text-align:center;
+    }
+
+    /* floating minimal hearts */
+    .float{
+      position: fixed;
+      left: 0;
+      bottom: -30px;
+      width: 10px;
+      height: 10px;
+      pointer-events: none;
+      z-index: 10;
+      animation: floatUp linear forwards;
+      filter: drop-shadow(0 10px 25px rgba(255, 59, 122, 0.12));
+    }
+    .float .h{
+      width: 10px;
+      height: 10px;
+      transform: rotate(45deg);
+      background: rgba(255, 59, 122, 0.30);
+      position: relative;
+    }
+    .float .h::before,
+    .float .h::after{
+      content:"";
+      position:absolute;
+      width: 10px;
+      height: 10px;
+      background: rgba(255, 59, 122, 0.30);
+      border-radius: 50%;
+    }
+    .float .h::before{ left:-5px; top:0; }
+    .float .h::after{ left:0; top:-5px; }
+
+    @keyframes floatUp{
+      0% { transform: translateY(0) scale(1); opacity: 0; }
+      12% { opacity: 1; }
+      100% { transform: translateY(-112vh) scale(1.6); opacity: 0; }
+    }
+
+    /* overlay */
+    .overlay{
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 246, 249, 0.90);
+      backdrop-filter: blur(10px);
+      z-index: 99;
+      padding: 18px;
+    }
+
+    .final{
+      width: min(92vw, 680px);
+      border-radius: 30px;
+      padding: 26px;
+      background: rgba(255,255,255,0.82);
+      border: 1px solid rgba(255, 90, 140, 0.16);
+      box-shadow: 0 22px 90px rgba(255, 90, 140, 0.14);
+      text-align: center;
+      transform: translateY(10px);
+      animation: rise .5s ease forwards;
+    }
+
+    .name{
+      font-size: 54px;
+      letter-spacing: 1px;
+      margin: 8px 0 8px;
+      font-weight: 950;
+      color: #ff3b7a;
+      text-shadow: 0 12px 45px rgba(255, 59, 122, 0.18);
+    }
+
+    .line{
+      width: 56px;
+      height: 2px;
+      background: rgba(255, 59, 122, 0.26);
+      margin: 10px auto 14px;
+      border-radius: 999px;
+    }
+
+    .finalText{
+      font-size: 18px;
+      line-height: 1.75;
+      font-weight: 900;
+      margin-bottom: 10px;
+      color:#2a1f24;
+      white-space: pre-line;
+    }
+
+    .mini{
+      font-size: 14px;
+      line-height: 1.7;
+      color: rgba(42,31,36,0.70);
+      margin-bottom: 18px;
+      white-space: pre-line;
+    }
+
+    .finalImage{
+      width: 100%;
+      max-width: 520px;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      border-radius: 22px;
+      border: 1px solid rgba(255, 90, 140, 0.18);
+      box-shadow: 0 20px 70px rgba(255, 90, 140, 0.12);
+      margin: 14px auto 18px;
+      display:block;
+    }
+
+    /* Game UI */
+    .gameTitle{
+      font-weight: 950;
+      font-size: 16px;
+      margin-bottom: 6px;
+      color:#2a1f24;
+    }
+
+    .gameHint{
+      font-size: 13px;
+      color: rgba(42,31,36,0.70);
+      line-height: 1.6;
+      margin-bottom: 12px;
+      white-space: pre-line;
+    }
+
+    .progress{
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255, 90, 140, 0.10);
+      border: 1px solid rgba(255, 90, 140, 0.14);
+      overflow:hidden;
+      margin-bottom: 14px;
+    }
+
+    .bar{
+      height: 100%;
+      width: 0%;
+      background: rgba(255, 59, 122, 0.55);
+      border-radius: 999px;
+      transition: width .25s ease;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .tile{
+      border-radius: 18px;
+      padding: 16px 10px;
+      text-align:center;
+      background: rgba(255,255,255,0.7);
+      border: 1px solid rgba(255, 90, 140, 0.14);
+      cursor:pointer;
+      font-weight: 900;
+      transition: transform .12s ease, background .12s ease;
+      user-select:none;
+    }
+    .tile:hover{ transform: translateY(-1px); }
+    .tile:active{ transform: scale(.98); }
+
+    .tile.good{
+      background: rgba(255, 59, 122, 0.10);
+      border-color: rgba(255, 59, 122, 0.25);
+    }
+    .tile.bad{
+      opacity: .55;
+    }
+
+    .choices{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .choice{
+      border-radius: 18px;
+      padding: 14px 14px;
+      background: rgba(255,255,255,0.72);
+      border: 1px solid rgba(255, 90, 140, 0.14);
+      cursor:pointer;
+      font-weight: 900;
+      transition: transform .12s ease;
+      user-select:none;
+      text-align:left;
+    }
+    .choice:hover{ transform: translateY(-1px); }
+    .choice:active{ transform: scale(.98); }
+
+    .center{
+      display:flex;
+      justify-content:center;
+      gap:10px;
+      flex-wrap: wrap;
+    }
+
+    .pill{
+      padding: 10px 12px;
+      border-radius: 999px;
+      background: rgba(255, 90, 140, 0.08);
+      border: 1px solid rgba(255, 90, 140, 0.14);
+      font-weight: 900;
+      font-size: 13px;
+      cursor:pointer;
+      user-select:none;
+      transition: transform .12s ease;
+    }
+    .pill:hover{ transform: translateY(-1px); }
+    .pill:active{ transform: scale(.98); }
+
+    .success{
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: rgba(255, 59, 122, 0.08);
+      border: 1px solid rgba(255, 59, 122, 0.16);
+      font-weight: 900;
+      line-height: 1.7;
+      white-space: pre-line;
+    }
+  </style>
 </head>
+
 <body>
+  <div class="wrap">
+    <div class="card">
+      <div class="top">
+        <div class="chip">for you <span class="tiny-heart"></span></div>
+        <div class="chip" id="stageChip">stage 1/4</div>
+      </div>
 
-    <div id="step-info" class="container">
-        <h2 id="info-title">ยืนยันตัวตน 💖</h2>
-        <p id="info-desc">กรุณาระบุชื่อเล่นของคุณ</p>
-        <input type="text" id="info-input" placeholder="พิมพ์ตรงนี้...">
-        <button class="btn" onclick="processInfo()">ตกลง</button>
+      <h1 id="title">คนดีของพี่…</h1>
+      <div class="sub" id="subtitle">
+        เว็บนี้ฉันตั้งใจทำให้นะ 💗  
+        เป็นของขวัญล่วงหน้าก่อนวันเกิด
+      </div>
+
+      <!-- MAIN PANEL -->
+      <div class="panel">
+        <div class="typing" id="mainBox">...</div>
+      </div>
+
+      <div class="actions" id="actions">
+        <button class="primary" id="btnNext">ไปต่อ</button>
+        <button class="ghost" id="btnHearts">ปล่อยหัวใจ</button>
+      </div>
+
+      <div class="foot">made with love</div>
     </div>
+  </div>
 
-    <div id="step-quiz" class="container hidden">
-        <h2 id="quiz-header">ปริศนาที่ 1</h2>
-        <div class="img-box">
-            <img id="quiz-img" src="" class="quiz-img">
+  <!-- Final -->
+  <div class="overlay" id="overlay">
+    <div class="final">
+      <div class="chip" style="display:inline-block;">final</div>
+      <div class="name" id="loverName">ICE</div>
+      <div class="line"></div>
+
+      <img id="finalImage" class="finalImage" alt="our photo" />
+
+      <div class="finalText" id="finalText">เอาของขวัญจากพี่ไปได้เลย</div>
+      <div class="mini" id="finalMini">
+        ขอบคุณที่เข้ามาเป็นความสบายใจของพี่  
+        ต่อไปนี้…ขออยู่ข้างๆ เธอ 💗
+      </div>
+
+      <div class="actions" style="grid-template-columns:1fr;">
+        <button class="primary" id="btnBoom">หัวใจของพี่</button>
+        <button class="ghost" id="btnClose">ปิด</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =============================
+    // CUSTOMIZE
+    // =============================
+    const loverName = "ICE"; // เปลี่ยนชื่อแฟนตรงนี้
+
+    // ใส่รูป: ใช้ URL รูป หรือใส่ชื่อไฟล์ (ถ้าอยู่โฟลเดอร์เดียวกัน)
+    // ตัวอย่าง: "photo.jpg" หรือ "images/us.jpg"
+    const finalImage = "https://s.imgz.io/2026/02/17/e1dfd95c82846cb82b05b6a1adcdaca49b422dbcb5f8ae9b.png";
+
+    const storyMessages = [
+      "พี่มีอะไรอยากบอกเธอ…",
+      "มันอาจจะไม่ได้ยิ่งใหญ่อะไรนะ 🤔",
+      "แต่มันยอมไม่ได้กับเสื้อ Homeboy ที่เธอให้",
+      "แต่ก่อนจะถึงตรงนั้น\nขอให้เธอผ่าน 3 ด่านน่ารักๆ ก่อน 😳",
+      "พร้อมแล้วใช่ไหม 💗"
+    ];
+
+    // =============================
+    // ELEMENTS
+    // =============================
+    const stageChip = document.getElementById("stageChip");
+    const titleEl = document.getElementById("title");
+    const subtitleEl = document.getElementById("subtitle");
+    const mainBox = document.getElementById("mainBox");
+
+    const actions = document.getElementById("actions");
+    const btnNext = document.getElementById("btnNext");
+    const btnHearts = document.getElementById("btnHearts");
+
+    const overlay = document.getElementById("overlay");
+    const loverNameEl = document.getElementById("loverName");
+    const finalImageEl = document.getElementById("finalImage");
+    const btnClose = document.getElementById("btnClose");
+    const btnBoom = document.getElementById("btnBoom");
+
+    loverNameEl.textContent = loverName;
+
+    // fallback image
+    finalImageEl.src = finalImage || "https://images.unsplash.com/photo-1520975958225-96c4b64d6c5f?auto=format&fit=crop&w=1200&q=60";
+
+    // =============================
+    // FLOAT HEARTS
+    // =============================
+    function spawnFloat(){
+      const el = document.createElement("div");
+      el.className = "float";
+      el.innerHTML = `<div class="h"></div>`;
+
+      const left = Math.random() * 100;
+      const duration = 3.4 + Math.random() * 3.8;
+      const scale = 0.8 + Math.random() * 1.5;
+
+      el.style.left = left + "vw";
+      el.style.animationDuration = duration + "s";
+      el.style.transform = `scale(${scale})`;
+
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), duration * 1000);
+    }
+
+    function floatHearts(amount=10){
+      for(let i=0;i<amount;i++){
+        setTimeout(spawnFloat, i*95);
+      }
+    }
+
+    btnHearts.addEventListener("click", () => floatHearts(14));
+
+    document.body.addEventListener("click", (e) => {
+      if(e.target.tagName.toLowerCase() === "button") return;
+      floatHearts(6);
+    });
+
+    // =============================
+    // TYPING EFFECT
+    // =============================
+    let typing = false;
+    function typeText(text){
+      typing = true;
+      mainBox.textContent = "";
+      let i = 0;
+
+      const timer = setInterval(() => {
+        mainBox.textContent += text[i];
+        i++;
+        if(i >= text.length){
+          clearInterval(timer);
+          typing = false;
+        }
+      }, 32);
+    }
+
+    // =============================
+    // STAGES
+    // 0 = story
+    // 1 = game1 (tap hearts)
+    // 2 = game2 (memory)
+    // 3 = game3 (quiz)
+    // 4 = final
+    // =============================
+    let stage = 0;
+    let storyIndex = 0;
+
+    function setStageChip(){
+      // stage 1/4 = story + 3 games
+      const map = {
+        0: "stage 1/4",
+        1: "stage 2/4",
+        2: "stage 3/4",
+        3: "stage 4/4"
+      };
+      stageChip.textContent = map[stage] || "final";
+    }
+
+    setStageChip();
+    typeText(storyMessages[storyIndex]);
+
+    btnNext.addEventListener("click", () => {
+      if(typing) return;
+
+      // stage 0 story
+      if(stage === 0){
+        storyIndex++;
+        floatHearts(10);
+
+        if(storyIndex < storyMessages.length){
+          typeText(storyMessages[storyIndex]);
+          return;
+        }
+
+        // go to game1
+        stage = 1;
+        setStageChip();
+        renderGame1();
+        return;
+      }
+
+      // stage = game1/2/3 -> next only if completed (handled in game)
+    });
+
+    // =============================
+    // GAME 1: Tap hearts to fill progress
+    // =============================
+    let game1Score = 0;
+    function renderGame1(){
+      titleEl.textContent = "ด่านที่ 1";
+      subtitleEl.textContent = "เก็บหัวใจให้ครบ เพื่อปลดล็อกด่านต่อไป 💗";
+
+      actions.innerHTML = `
+        <button class="primary" id="g1Tap">แตะเพื่อรับหัวใจ +1</button>
+      `;
+
+      mainBox.innerHTML = `
+        <div class="gameTitle">Mini Game 1 — Heart Meter</div>
+        <div class="gameHint">แตะปุ่มให้ครบ 10 ครั้ง (ง่ายมาก แต่เราตั้งใจทำ 😌)</div>
+        <div class="progress"><div class="bar" id="g1Bar"></div></div>
+        <div style="font-weight:900; opacity:.9;">หัวใจ: <span id="g1Count">0</span>/10</div>
+      `;
+
+      const g1Tap = document.getElementById("g1Tap");
+      const g1Skip = document.getElementById("g1Skip");
+      const g1Bar = document.getElementById("g1Bar");
+      const g1Count = document.getElementById("g1Count");
+
+      game1Score = 0;
+
+      function update(){
+        g1Count.textContent = game1Score;
+        g1Bar.style.width = (game1Score/10)*100 + "%";
+      }
+
+      g1Tap.addEventListener("click", () => {
+        game1Score++;
+        floatHearts(5);
+        if(game1Score > 10) game1Score = 10;
+        update();
+
+        if(game1Score >= 10){
+          showSuccess("ผ่านแล้ว 💗\nไปด่านต่อไปกัน");
+          setTimeout(() => {
+            stage = 2;
+            setStageChip();
+            renderGame2();
+          }, 700);
+        }
+      });
+
+      g1Skip.addEventListener("click", () => {
+        showSuccess("โอเค…ให้ผ่านก็ได้ 😳\nไปด่านต่อไป");
+        setTimeout(() => {
+          stage = 2;
+          setStageChip();
+          renderGame2();
+        }, 650);
+      });
+
+      update();
+    }
+
+    // =============================
+    // GAME 2: Memory (find the love tile)
+    // =============================
+    let g2Answer = 0;
+    function renderGame2(){
+      titleEl.textContent = "ด่านที่ 2";
+      subtitleEl.textContent = "เกมจำตำแหน่งนิดเดียว (น่ารักมาก)";
+
+      const tiles = Array.from({length:9}, (_,i)=>i);
+      g2Answer = Math.floor(Math.random() * 9);
+
+      mainBox.innerHTML = `
+        <div class="gameTitle">Mini Game 2 — Find the 💗</div>
+        <div class="gameHint">
+          จำตำแหน่ง 💗 ให้ดี…\nอีก 1 วินาทีมันจะหาย แล้วให้เธอกดเลือก
         </div>
-        <p id="quiz-question">ภาพนี้คืออะไรเอ่ย?</p>
-        <div class="options-grid" id="quiz-options"></div>
-    </div>
+        <div class="grid" id="g2Grid"></div>
+      `;
 
-    <div id="step-reveal" class="container hidden">
-        <h2>ถูกต้องแล้วจ้า! 🎉</h2>
-        <div class="img-box">
-            <img id="reveal-img" src="" class="quiz-img">
+      actions.innerHTML = `
+        <button class="ghost" id="g2Reset">สุ่มใหม่</button>
+      `;
+
+      const grid = document.getElementById("g2Grid");
+      const g2Reset = document.getElementById("g2Reset");
+      const g2Skip = document.getElementById("g2Skip");
+
+      function build(showHeart){
+        grid.innerHTML = "";
+        tiles.forEach((i)=>{
+          const t = document.createElement("div");
+          t.className = "tile";
+          t.dataset.i = i;
+
+          if(showHeart && i === g2Answer){
+            t.textContent = "💗";
+            t.classList.add("good");
+          }else{
+            t.textContent = " ";
+          }
+
+          grid.appendChild(t);
+        });
+      }
+
+      // show for 1 sec
+      build(true);
+      setTimeout(() => build(false), 950);
+
+      grid.addEventListener("click", (e) => {
+        const tile = e.target.closest(".tile");
+        if(!tile) return;
+
+        const i = Number(tile.dataset.i);
+
+        if(i === g2Answer){
+          tile.textContent = "💗";
+          tile.classList.add("good");
+          floatHearts(12);
+
+          showSuccess("เก่งมาก 💗\nไปด่านสุดท้ายกันเลย");
+          setTimeout(() => {
+            stage = 3;
+            setStageChip();
+            renderGame3();
+          }, 750);
+        }else{
+          tile.textContent = "×";
+          tile.classList.add("bad");
+        }
+      });
+
+      g2Reset.addEventListener("click", () => {
+        g2Answer = Math.floor(Math.random() * 9);
+        build(true);
+        setTimeout(() => build(false), 950);
+      });
+
+      g2Skip.addEventListener("click", () => {
+        showSuccess("ได้เลย…\nแต่จริงๆ เธอทำได้อยู่แล้ว 😳");
+        setTimeout(() => {
+          stage = 3;
+          setStageChip();
+          renderGame3();
+        }, 700);
+      });
+    }
+
+    // =============================
+    // GAME 3: Sweet quiz (choose the correct one)
+    // =============================
+    function renderGame3(){
+      titleEl.textContent = "ด่านที่ 3";
+      subtitleEl.textContent = "เลือกคำตอบที่ถูกที่สุด 💗";
+
+      mainBox.innerHTML = `
+        <div class="gameTitle">Mini Game 3 — Choose the best</div>
+        <div class="gameHint">
+          ถ้าให้เลือก 1 ข้อ…\nอะไรคือสิ่งที่พี่อยากทำกับเธอมากที่สุด?
         </div>
-        <p id="reveal-desc" class="reveal-text">ข้อความเฉลย...</p>
-        <button class="btn" onclick="nextQuestion()">ไปข้อถัดไป ➔</button>
-    </div>
 
-    <div id="step-final" class="container hidden">
-        <img id="final-img" src="" style="width:130px; height:130px; border-radius:50%; border:5px solid var(--pink-main); margin-bottom:20px; object-fit:cover;">
-        <h2>Happy Valentine & HBD!</h2>
-        <p>คุณเก่งที่สุดเลย! ตอบถูกครบทุกข้อ <br>
-           ขอบคุณที่จำเรื่องราวของเราได้นะ <br>
-           รักที่สุดในโลกเลย! <span style="color:red">❤</span></p>
-    </div>
+        <div class="choices">
+          <div class="choice" data-a="0">A) หายไปเฉยๆ แล้วให้เธองง</div>
+          <div class="choice" data-a="1">B) อยู่ข้างๆ เธอในวันที่ดี และวันที่ไม่ดี</div>
+          <div class="choice" data-a="0">C) ทำเป็นไม่สนใจ ทั้งที่จริงๆ แอบรัก</div>
+          <div class="choice" data-a="0">D) ทะเลาะแล้วไม่ง้อ</div>
+        </div>
+      `;
 
-    <script>
-        // 1. ตั้งค่าข้อมูลส่วนตัว
-        const MASTER_DATA = [
-            { id: "nickname", title: "ยืนยันตัวตน 💖", desc: "ชื่อเล่นของคุณ?", ans: "ไอซ์" },
-            { id: "fullname", title: "ขอชื่อจริงด้วยจ้า 🌸", desc: "ชื่อจริง-นามสกุลของคุณ?", ans: "จิรพรรณ พิสุทรอานนท์" },
-            { id: "bday", title: "วันเกิดล่ะ 🎂", desc: "เกิดวันที่เท่าไหร่?", ans: "2001-02-20", type: "date" }
-        ];
+      actions.innerHTML = `
+        <button class="primary" id="g3Ready">ฉันเลือกแล้ว</button>
+      `;
 
-        // 2. ตั้งค่าเกมปริศนา (ภาพปริศนา + ภาพเฉลย)
-        const GAMES = [
-            {
-                puzzle_img: "https://img5.pic.in.th/file/secure-sv1/quiz14684d0a1e3986b1e.png", // ลิงก์ภาพที่เบลอหรือซูม
-                reveal_img: "https://img2.pic.in.th/quiz1aws024ff325a2fab2d5.png",   // ลิงก์ภาพที่เฉลยแบบชัดๆ
-                q: "ภาพเบลอๆ นี้คือตตตัวอะไรกันน้าาาา?",
-                options: ["หมู", "สิงโต", "แมว", "เธอ"],
-                correct: 2,
-                desc: "เก่งมาก....ก็มันคือแมวไงล้าาาา"
-            },
-            {
-                puzzle_img: "https://img2.pic.in.th/quiz2.png",
-                reveal_img: "https://img5.pic.in.th/file/secure-sv1/quiz2aws.png",
-                q: "แล้วตัวนี้ มันเป็นตัวอะไรนะ?",
-                options: ["ยีราฟ", "สิงโต", "ช้าง", "เธอ"],
-                correct: 3,
-                desc: "อ่าว ทำไมมันเป็นเธอไปได้ละเนี้ยยยยยย"
-            },
-            {
-                puzzle_img: "https://img2.pic.in.th/quiz3.png",
-                reveal_img: "https://img5.pic.in.th/file/secure-sv1/quiz3aws.png",
-                q: "การ์ตูนอะไรนะที่มีของวิเศษ ?",
-                options: ["โดเรไอซ์", "โดเรมอน", "โดเรซอลลา", "โดเรมี่"],
-                correct: 0,
-                desc: "โดเรไอซ์ ไงล้าาา ช่วยฉันทุกเรื่อย ซัพพอร์ตฉันตลอดเลยน้าาาาา💖💖"
-            },
-            {
-                puzzle_img: "https://img5.pic.in.th/file/secure-sv1/quiz4fb84abcf7647ae34.png",
-                reveal_img: "https://img2.pic.in.th/quiz4aws.png",
-                q: "การ์ตูนเรื่องอะไรที่เธอชอบดู?",
-                options: ["นักสืบไอซ์ตัวจิ้ว", "นักสืบเยาวชน", "โคนัน", "โคโค่"],
-                correct: 0,
-                desc: "นักสืบไอซ์ตัวจิ้ว ไงล่ะ สืบฉันรู้ทุกเรื่องไปหมมดเลยน่ะ คนดีของพี่"
-            }
-        ];
+      let chosen = null;
+      const choices = mainBox.querySelectorAll(".choice");
+      const g3Skip = document.getElementById("g3Skip");
+      const g3Ready = document.getElementById("g3Ready");
 
-        const FINAL_PHOTO = "https://img2.pic.in.th/0dc81298-2bd1-4b6f-80e3-fdd001212c40.jpg";
+      choices.forEach(c=>{
+        c.addEventListener("click", ()=>{
+          choices.forEach(x=>x.style.outline = "none");
+          c.style.outline = "2px solid rgba(255, 59, 122, 0.35)";
+          chosen = c;
+        });
+      });
 
-        let infoIdx = 0;
-        let gameIdx = 0;
-
-        function processInfo() {
-            const input = document.getElementById('info-input');
-            const target = MASTER_DATA[infoIdx];
-            if (input.value === target.ans) {
-                infoIdx++;
-                if (infoIdx < MASTER_DATA.length) {
-                    const next = MASTER_DATA[infoIdx];
-                    document.getElementById('info-title').innerText = next.title;
-                    document.getElementById('info-desc').innerText = next.desc;
-                    input.type = next.type || "text";
-                    input.value = "";
-                } else {
-                    showStep('quiz'); loadQuiz();
-                }
-            } else { alert("ข้อมูลไม่ถูกต้องนะจ๊ะ!"); }
+      g3Ready.addEventListener("click", ()=>{
+        if(!chosen){
+          showSuccess("เลือกก่อนน้า 😳");
+          return;
         }
 
-        function loadQuiz() {
-            const data = GAMES[gameIdx];
-            document.getElementById('quiz-header').innerText = `ปริศนาที่ ${gameIdx + 1}`;
-            document.getElementById('quiz-img').src = data.puzzle_img;
-            document.getElementById('quiz-question').innerText = data.q;
-            const optDiv = document.getElementById('quiz-options');
-            optDiv.innerHTML = '';
-            data.options.forEach((opt, idx) => {
-                const b = document.createElement('button');
-                b.className = 'option-btn';
-                b.innerText = opt;
-                b.onclick = () => {
-                    if(idx === data.correct) showReveal();
-                    else alert("ผิดแล้ววว ลองดูใหม่!");
-                };
-                optDiv.appendChild(b);
-            });
-        }
+        const ok = chosen.dataset.a === "1";
 
-        function showReveal() {
-            const data = GAMES[gameIdx];
-            document.getElementById('reveal-img').src = data.reveal_img;
-            document.getElementById('reveal-desc').innerText = data.desc;
-            showStep('reveal');
+        if(ok){
+          floatHearts(18);
+          showSuccess("ถูกต้อง 💗\nงั้น…ไปฟังคำสุดท้ายกัน");
+          setTimeout(showFinal, 850);
+        }else{
+          showSuccess("ไม่ใช่ข้อนั้น 😳\nลองใหม่อีกที");
         }
+      });
 
-        function nextQuestion() {
-            gameIdx++;
-            if (gameIdx < GAMES.length) {
-                showStep('quiz'); loadQuiz();
-            } else {
-                document.getElementById('final-img').src = FINAL_PHOTO;
-                showStep('final');
-            }
-        }
+      g3Skip.addEventListener("click", ()=>{
+        showSuccess("โอเค…\nแต่คำสุดท้ายต้องฟังนะ 💗");
+        setTimeout(showFinal, 800);
+      });
+    }
 
-        function showStep(id) {
-            document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
-            document.getElementById('step-' + id).classList.remove('hidden');
-        }
-    </script>
+    // =============================
+    // SUCCESS BOX
+    // =============================
+    function showSuccess(text){
+      const old = document.getElementById("successBox");
+      if(old) old.remove();
+
+      const box = document.createElement("div");
+      box.className = "success";
+      box.id = "successBox";
+      box.textContent = text;
+
+      const panel = document.querySelector(".panel");
+      panel.appendChild(box);
+
+      setTimeout(() => {
+        if(box && box.parentNode) box.remove();
+      }, 2200);
+    }
+
+    // =============================
+    // FINAL
+    // =============================
+    function showFinal(){
+      overlay.style.display = "flex";
+      floatHearts(25);
+    }
+
+    btnClose.addEventListener("click", ()=>{
+      overlay.style.display = "none";
+      floatHearts(10);
+    });
+
+    btnBoom.addEventListener("click", ()=>{
+      const cx = window.innerWidth / 2;
+      const cy = window.innerHeight / 2;
+
+      for(let i=0;i<60;i++){
+        const el = document.createElement("div");
+        el.className = "float";
+        el.innerHTML = `<div class="h"></div>`;
+        el.style.position = "fixed";
+        el.style.left = cx + "px";
+        el.style.top = cy + "px";
+        el.style.bottom = "auto";
+        el.style.animation = "none";
+        el.style.zIndex = 999;
+
+        const scale = 0.7 + Math.random() * 1.6;
+        el.style.transform = `scale(${scale})`;
+
+        document.body.appendChild(el);
+
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 2 + Math.random() * 7;
+
+        let x = cx, y = cy;
+        let life = 0;
+        const maxLife = 105;
+
+        const t = setInterval(() => {
+          life++;
+          x += Math.cos(angle) * speed;
+          y += Math.sin(angle) * speed;
+
+          el.style.left = x + "px";
+          el.style.top = y + "px";
+          el.style.opacity = (1 - life/maxLife);
+
+          if(life >= maxLife){
+            clearInterval(t);
+            el.remove();
+          }
+        }, 16);
+      }
+    });
+  </script>
 </body>
 </html>
